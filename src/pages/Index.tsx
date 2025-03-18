@@ -4,13 +4,14 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Book, Calendar, Clock, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchHijriDate, fetchPrayerTimes, getRandomMotivation } from "@/lib/api";
+import { fetchHijriDate, fetchPrayerTimes, getCityNameFromCoordinates, getRandomMotivation } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getLastReadingPage, getLastReadingSurah } from "@/lib/storage";
 import { PRAYER_METHODS } from "@/lib/types";
 
 const Index = () => {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [cityName, setCityName] = useState<string>("جاري تحديد الموقع...");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [motivation, setMotivation] = useState(getRandomMotivation());
 
@@ -28,15 +29,22 @@ const Index = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         position => {
-          setLocation({
+          const coords = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
-          });
+          };
+          setLocation(coords);
+          
+          // Get city name from coordinates
+          getCityNameFromCoordinates(coords.latitude, coords.longitude)
+            .then(city => setCityName(city))
+            .catch(() => setCityName("غير معروف"));
         },
         error => {
           console.error("Error getting location:", error);
           // Default to Mecca coordinates if location access is denied
           setLocation({ latitude: 21.3891, longitude: 39.8579 });
+          setCityName("مكة المكرمة (الافتراضي)");
         }
       );
     }
@@ -108,10 +116,13 @@ const Index = () => {
             day: 'numeric' 
           })}
         </p>
+        <p className="text-sm text-islamic-green mt-1">
+          {cityName}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card className="bg-islamic-green/10 border-islamic-green/20">
+        <Card className="bg-islamic-green/10 border-islamic-green/20 hover:bg-islamic-green/15 transition-all transform hover:scale-105">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center text-islamic-green">
               <Clock className="mr-2 h-5 w-5" />
@@ -136,7 +147,7 @@ const Index = () => {
         </Card>
 
         <Link to="/quran">
-          <Card className="h-full bg-islamic-gold/10 border-islamic-gold/20 hover:bg-islamic-gold/20 transition-colors">
+          <Card className="h-full bg-islamic-gold/10 border-islamic-gold/20 hover:bg-islamic-gold/20 transition-all transform hover:scale-105">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center text-islamic-gold">
                 <Book className="mr-2 h-5 w-5" />
@@ -151,7 +162,7 @@ const Index = () => {
         </Link>
 
         <Link to="/hadith">
-          <Card className="h-full bg-islamic-blue/10 border-islamic-blue/20 hover:bg-islamic-blue/20 transition-colors">
+          <Card className="h-full bg-islamic-blue/10 border-islamic-blue/20 hover:bg-islamic-blue/20 transition-all transform hover:scale-105">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center text-islamic-blue">
                 <Users className="mr-2 h-5 w-5" />
@@ -166,7 +177,7 @@ const Index = () => {
         </Link>
 
         <Link to="/dhikr">
-          <Card className="h-full bg-islamic-teal/10 border-islamic-teal/20 hover:bg-islamic-teal/20 transition-colors">
+          <Card className="h-full bg-islamic-teal/10 border-islamic-teal/20 hover:bg-islamic-teal/20 transition-all transform hover:scale-105">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center text-islamic-teal">
                 <Calendar className="mr-2 h-5 w-5" />
@@ -181,7 +192,7 @@ const Index = () => {
         </Link>
       </div>
 
-      <Card className="mb-8">
+      <Card className="mb-8 shadow-lg border-islamic-green/30">
         <CardHeader>
           <CardTitle>آية اليوم</CardTitle>
         </CardHeader>
@@ -193,9 +204,10 @@ const Index = () => {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="shadow-lg hover:shadow-xl transition-all">
           <CardHeader>
             <CardTitle>مواقيت الصلاة اليوم</CardTitle>
+            <CardDescription>{cityName}</CardDescription>
           </CardHeader>
           <CardContent>
             {prayerTimesLoading ? (
@@ -209,27 +221,27 @@ const Index = () => {
               </div>
             ) : prayerTimes ? (
               <div className="space-y-2">
-                <div className="flex justify-between">
+                <div className="flex justify-between p-2 hover:bg-islamic-green/5 rounded-md">
                   <span className="font-semibold">الفجر</span>
                   <span>{prayerTimes.timings.Fajr}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between p-2 hover:bg-islamic-green/5 rounded-md">
                   <span className="font-semibold">الشروق</span>
                   <span>{prayerTimes.timings.Sunrise}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between p-2 hover:bg-islamic-green/5 rounded-md">
                   <span className="font-semibold">الظهر</span>
                   <span>{prayerTimes.timings.Dhuhr}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between p-2 hover:bg-islamic-green/5 rounded-md">
                   <span className="font-semibold">العصر</span>
                   <span>{prayerTimes.timings.Asr}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between p-2 hover:bg-islamic-green/5 rounded-md">
                   <span className="font-semibold">المغرب</span>
                   <span>{prayerTimes.timings.Maghrib}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between p-2 hover:bg-islamic-green/5 rounded-md">
                   <span className="font-semibold">العشاء</span>
                   <span>{prayerTimes.timings.Isha}</span>
                 </div>
@@ -242,7 +254,7 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-lg hover:shadow-xl transition-all">
           <CardHeader>
             <CardTitle>روابط سريعة</CardTitle>
           </CardHeader>
@@ -250,28 +262,28 @@ const Index = () => {
             <div className="grid grid-cols-2 gap-4">
               <Link 
                 to="/quran" 
-                className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted hover:bg-islamic-green/10 transition-colors"
               >
                 <Book className="h-8 w-8 mb-2 text-islamic-green" />
                 <span className="text-sm">القرآن الكريم</span>
               </Link>
               <Link 
                 to="/hadith" 
-                className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted hover:bg-islamic-blue/10 transition-colors"
               >
                 <Users className="h-8 w-8 mb-2 text-islamic-blue" />
                 <span className="text-sm">الأحاديث النبوية</span>
               </Link>
               <Link 
                 to="/prayer-times" 
-                className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted hover:bg-islamic-gold/10 transition-colors"
               >
                 <Clock className="h-8 w-8 mb-2 text-islamic-gold" />
                 <span className="text-sm">مواقيت الصلاة</span>
               </Link>
               <Link 
                 to="/dhikr" 
-                className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted hover:bg-islamic-teal/10 transition-colors"
               >
                 <Calendar className="h-8 w-8 mb-2 text-islamic-teal" />
                 <span className="text-sm">الأذكار والتسبيح</span>

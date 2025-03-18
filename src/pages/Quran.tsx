@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, Book, Bookmark, Play, Settings, Share2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Book, Bookmark, ChevronDown, Play, Settings, Share2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +30,12 @@ import {
 } from "@/lib/storage";
 import { Surah, SurahDetail } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Quran = () => {
   const { toast } = useToast();
@@ -41,7 +47,8 @@ const Quran = () => {
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [reciter, setReciter] = useState(getSelectedReciter());
-  const [motivationalMessage, setMotivationalMessage] = useState("");
+  const [motivationalMessage, setMotivationalMessage] = useState(getRandomMotivation());
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Fetch list of surahs
   const { data: surahs, isLoading: surahsLoading } = useQuery({
@@ -118,6 +125,7 @@ const Quran = () => {
     }
     setActiveSurah(surahNumber);
     setActiveAyah(1); // Reset to first ayah when changing surah
+    setDropdownOpen(false); // Close dropdown after selection
   };
 
   const handleTabClose = (surahNumber: number, e: React.MouseEvent) => {
@@ -140,7 +148,7 @@ const Quran = () => {
 
   // Format surah name with bismillah
   const formatSurahName = (surah: Surah) => {
-    return `${surah.number}. ${surah.name} (${surah.englishName})`;
+    return `${surah.number}. ${surah.name}`;
   };
 
   // Share functionality
@@ -237,8 +245,40 @@ const Quran = () => {
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {/* Surah list sidebar */}
-        <Card className="md:col-span-1">
+        {/* Surah dropdown for mobile view */}
+        <div className="md:hidden w-full mb-4">
+          <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-full flex justify-between items-center">
+                <span>اختر سورة</span>
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-full max-h-[50vh] overflow-auto">
+              {surahsLoading ? (
+                Array(10).fill(0).map((_, i) => (
+                  <DropdownMenuItem key={i} disabled>
+                    <Skeleton className="h-6 w-full" />
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                surahs?.map((surah: Surah) => (
+                  <DropdownMenuItem 
+                    key={surah.number}
+                    onClick={() => handleTabOpen(surah.number)}
+                    className={activeSurah === surah.number ? "bg-secondary" : ""}
+                  >
+                    <span className="ml-2">{surah.number}.</span>
+                    <span>{surah.name}</span>
+                  </DropdownMenuItem>
+                ))
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        
+        {/* Surah list sidebar for desktop */}
+        <Card className="hidden md:block md:col-span-1">
           <CardHeader>
             <CardTitle>قائمة السور</CardTitle>
             <CardDescription>
@@ -283,7 +323,7 @@ const Quran = () => {
               </CardContent>
             </Card>
           ) : (
-            <Card>
+            <Card className="shadow-lg">
               <CardHeader className="border-b p-2">
                 <TabsList className="flex-wrap">
                   {openTabs.map(tabId => {
@@ -348,7 +388,7 @@ const Quran = () => {
                                     key={ayah.number} 
                                     className={`p-2 rounded-md arabic-text text-lg leading-loose ${
                                       ayah.numberInSurah === activeAyah ? 'bg-islamic-green/10' : ''
-                                    }`}
+                                    } hover:bg-islamic-green/5 transition-colors`}
                                     onClick={() => setActiveAyah(ayah.numberInSurah)}
                                   >
                                     {ayah.text} 

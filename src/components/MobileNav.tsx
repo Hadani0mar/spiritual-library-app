@@ -80,6 +80,10 @@ const MobileNav = () => {
                     </Link>
                   ))}
                 </div>
+                
+                <div className="mt-8 pt-4 border-t text-center text-xs text-muted-foreground">
+                  تم التطوير بواسطة m0usa_0mar
+                </div>
               </div>
             </SheetContent>
           </Sheet>
