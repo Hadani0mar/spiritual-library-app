@@ -17,7 +17,7 @@ const MainLayout = () => {
           </main>
           <BottomNav />
           <footer className="p-2 text-center text-xs text-muted-foreground hidden md:block">
-            تم التطوير بواسطة m0usa_0mar
+            تم التطوير بواسطة Bn0mar
           </footer>
         </div>
       </div>
