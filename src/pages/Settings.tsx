@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { BellRing, Book, Moon, Palette, Settings as SettingsIcon, Sun, Trash, Volume2 } from "lucide-react";
@@ -156,7 +155,7 @@ const Settings = () => {
                     />
                     <Label
                       htmlFor="theme-light"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary"
                     >
                       <Sun className="h-6 w-6 mb-2" />
                       فاتح
@@ -171,7 +170,7 @@ const Settings = () => {
                     />
                     <Label
                       htmlFor="theme-dark"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary"
                     >
                       <Moon className="h-6 w-6 mb-2" />
                       داكن
@@ -186,7 +185,7 @@ const Settings = () => {
                     />
                     <Label
                       htmlFor="theme-system"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary"
                     >
                       <Palette className="h-6 w-6 mb-2" />
                       تلقائي
@@ -211,7 +210,7 @@ const Settings = () => {
                     <AlertDialogHeader>
                       <AlertDialogTitle>مسح جميع البيانات</AlertDialogTitle>
                       <AlertDialogDescription>
-                        هذا الإجراء سيؤدي إلى مسح جميع البيانات المحفوظة، بما في ذلك آخر موضع قراءة، والإعدادات، وتحديات الأذكار. هل أنت متأكد من المتابعة؟
+                        هذا الإجراء سيؤدي إلى مسح جميع البيانات المحفوظة، بما في ذلك آخر موضع قراءة، والإعدادات، وتحديات الحفظ.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -265,7 +264,7 @@ const Settings = () => {
                     />
                     <Label
                       htmlFor="view-text"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary"
                     >
                       <Book className="h-6 w-6 mb-2" />
                       نص
@@ -280,7 +279,7 @@ const Settings = () => {
                     />
                     <Label
                       htmlFor="view-image"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary"
                     >
                       <Book className="h-6 w-6 mb-2" />
                       صور المصحف
@@ -405,7 +404,7 @@ const Settings = () => {
       </Card>
       
       <div className="mt-8 text-center text-sm text-muted-foreground">
-        <p>تطبيق إسلامي شامل | الإصدار 1.0</p>
+        <p>تم التطوير بواسطة Bn0mar</p>
         <p className="mt-1">جميع البيانات محفوظة محليًا في متصفحك</p>
       </div>
     </div>
