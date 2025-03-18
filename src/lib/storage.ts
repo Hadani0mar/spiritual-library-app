@@ -10,7 +10,13 @@ const KEYS = {
   DHIKR_CHALLENGES: 'islamic-app:dhikr-challenges',
   NOTIFICATION_SETTINGS: 'islamic-app:notification-settings',
   QURAN_VIEW_MODE: 'islamic-app:quran-view-mode', // 'text' or 'image'
+  SURAHS_LIST: 'islamic-app:surahs-list',  // Cached list of all surahs
+  SURAH_CACHE_PREFIX: 'islamic-app:surah-',  // Prefix for individual surah caches
+  SURAH_CACHE_TIMESTAMP: 'islamic-app:surahs-timestamp',  // When the cache was last updated
 };
+
+// Cache validity duration (7 days in milliseconds)
+const CACHE_VALIDITY = 7 * 24 * 60 * 60 * 1000;
 
 // Generic get and set functions
 const getItem = <T>(key: string, defaultValue: T): T => {
@@ -119,7 +125,57 @@ export const setNotificationSettings = (settings: NotificationSettings): void =>
 export const getQuranViewMode = (): 'text' | 'image' => getItem<'text' | 'image'>(KEYS.QURAN_VIEW_MODE, 'text');
 export const setQuranViewMode = (mode: 'text' | 'image'): void => setItem(KEYS.QURAN_VIEW_MODE, mode);
 
+// New Quran caching functions
+export const getCachedSurahsList = () => {
+  return getItem(KEYS.SURAHS_LIST, null);
+};
+
+export const setCachedSurahsList = (surahs: any) => {
+  setItem(KEYS.SURAHS_LIST, surahs);
+  setItem(KEYS.SURAH_CACHE_TIMESTAMP, Date.now());
+};
+
+export const getCachedSurah = (surahNumber: number) => {
+  return getItem(`${KEYS.SURAH_CACHE_PREFIX}${surahNumber}`, null);
+};
+
+export const setCachedSurah = (surahNumber: number, surahData: any) => {
+  setItem(`${KEYS.SURAH_CACHE_PREFIX}${surahNumber}`, surahData);
+};
+
+export const isCacheValid = () => {
+  const timestamp = getItem(KEYS.SURAH_CACHE_TIMESTAMP, 0);
+  return Date.now() - timestamp < CACHE_VALIDITY;
+};
+
+export const isSurahCached = (surahNumber: number) => {
+  return !!localStorage.getItem(`${KEYS.SURAH_CACHE_PREFIX}${surahNumber}`);
+};
+
+// Clear all cached surahs
+export const clearQuranCache = () => {
+  // Clear the surahs list
+  localStorage.removeItem(KEYS.SURAHS_LIST);
+  
+  // Clear timestamp
+  localStorage.removeItem(KEYS.SURAH_CACHE_TIMESTAMP);
+  
+  // Clear all individual surah caches
+  for (let i = 1; i <= 114; i++) {
+    localStorage.removeItem(`${KEYS.SURAH_CACHE_PREFIX}${i}`);
+  }
+};
+
 // Clear all stored data
 export const clearAllData = (): void => {
-  Object.values(KEYS).forEach(key => localStorage.removeItem(key));
+  Object.values(KEYS).forEach(key => {
+    if (typeof key === 'string' && !key.includes('PREFIX')) {
+      localStorage.removeItem(key);
+    }
+  });
+  
+  // Clear all surah caches
+  for (let i = 1; i <= 114; i++) {
+    localStorage.removeItem(`${KEYS.SURAH_CACHE_PREFIX}${i}`);
+  }
 };

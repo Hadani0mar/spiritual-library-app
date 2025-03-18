@@ -1,24 +1,77 @@
 
-// Quran API - Using Alquran.cloud API
+import { 
+  getCachedSurahsList,
+  setCachedSurahsList,
+  getCachedSurah,
+  setCachedSurah,
+  isCacheValid,
+  isSurahCached
+} from "./storage";
+
+// Quran API - Using Alquran.cloud API with local storage caching
 export const fetchSurahList = async () => {
   try {
+    // Check if we have a valid cached list
+    const cachedSurahs = getCachedSurahsList();
+    if (cachedSurahs && isCacheValid()) {
+      console.log("Using cached surahs list");
+      return cachedSurahs;
+    }
+
+    console.log("Fetching fresh surahs list from API");
     const response = await fetch('https://api.alquran.cloud/v1/surah');
     const data = await response.json();
+    
+    // Cache the results
+    if (data.data && Array.isArray(data.data)) {
+      setCachedSurahsList(data.data);
+    }
+    
     return data.data;
   } catch (error) {
     console.error("Error fetching surah list:", error);
-    // Return fallback data if API fails
+    
+    // Try to use cached data even if expired
+    const cachedSurahs = getCachedSurahsList();
+    if (cachedSurahs) {
+      console.log("Using expired cached surahs as fallback");
+      return cachedSurahs;
+    }
+    
+    // Return fallback data if API fails and no cache
     return getFallbackSurahs();
   }
 };
 
 export const fetchSurah = async (surahNumber: number) => {
   try {
+    // Check if we have this surah cached
+    const cachedSurah = getCachedSurah(surahNumber);
+    if (cachedSurah && isCacheValid()) {
+      console.log(`Using cached surah ${surahNumber}`);
+      return cachedSurah;
+    }
+
+    console.log(`Fetching fresh surah ${surahNumber} from API`);
     const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
     const data = await response.json();
+    
+    // Cache the results
+    if (data.data) {
+      setCachedSurah(surahNumber, data.data);
+    }
+    
     return data.data;
   } catch (error) {
     console.error("Error fetching surah:", error);
+    
+    // Try to use cached data even if expired
+    const cachedSurah = getCachedSurah(surahNumber);
+    if (cachedSurah) {
+      console.log(`Using expired cached surah ${surahNumber} as fallback`);
+      return cachedSurah;
+    }
+    
     // Return fallback data for this surah if API fails
     return getFallbackSurah(surahNumber);
   }
